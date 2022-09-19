@@ -1,41 +1,51 @@
 #include "nlohmann/json.hpp"
 #include <iostream>
+#include <map>
 
 using namespace std;
 using json = nlohmann::json;
 
 /*
- * Given a json object and an index reference
- * prints key value pair indexed. 
- * In case of nested objbects it큦 indexed with a "." inbetween.
+ * Given a json object, an index reference and a map pointer
+ * adds to the map the json at it's index + key.
+ * In case of nested objects it큦 indexed with a "." inbetween.
  */
-void iterate_json(json myObject, string cur_index)
+void iterate_json(json myObject, string cur_index, map<string, json>* myMap)
 {
 	//for each key in my json object
 	for (auto& el : myObject.items())
 	{
+		json value = el.value();
+
 		//if my element is a json object, iterate throught it
-		if (el.value().is_object())
+		if (value.is_object())
 		{
 			//recursive call
-			iterate_json(el.value(), cur_index + el.key() + ".");
+			iterate_json(value, cur_index + el.key() + ".", myMap);
 		}
 		else
-			// show key value pair through command line
-			cout << cur_index << el.key() << " = " << el.value() << endl;
+		{
+			string index = cur_index + el.key();
+			myMap->insert({index, value});
+		}
 	}
 }
 
+
 /*
- * Given text with JSON format 
- * it prints the key value pair 
- * concatenating the nested with "."
+ * Given text with JSON format
+ * adds returns all json objects in a map
+ * indexing at it큦 key value. In case of nesting
+ * it큦 indexed with a "." inbetween.
  */
-void dictionary_of_JSON(string data)
+map<string, json> dictionary_of_JSON(string data)
 {
+	map<string, json> myMap;
+
 	//parse json & start recursivity
 	json myObject = json::parse(data);
-	iterate_json(myObject, "");
+	iterate_json(myObject, "", &myMap);
+	return myMap;
 }
 
 
@@ -56,7 +66,14 @@ int main() {
 				  }
 		}
 	)";
+	map<string, json> myMap = dictionary_of_JSON(data);
 
-	dictionary_of_JSON(data);
+	while (true)
+	{
+		string input;
+		getline(cin, input);
+
+		cout << myMap.at(input)<< "\n";
+	}
 
 }
