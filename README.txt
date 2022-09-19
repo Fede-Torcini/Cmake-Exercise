@@ -10,7 +10,7 @@ Compiling
 		ex: "c:ProjectDir\cmake_ejercicio\src\" create "c:ProjectDir\cmake_ejercicio\build\"
 
 	2.2 From the build directory run 
-		cmake ../src
+		cmake ../
 
 	2.3 From the build directory run 
 		cmake --build .
